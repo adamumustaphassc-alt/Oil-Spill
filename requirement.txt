@@ -8,3 +8,7 @@ gdown
 huggingface_hub
 pandas
 scikit-learn
+torch
+torch
+torchvision
+streamlit
