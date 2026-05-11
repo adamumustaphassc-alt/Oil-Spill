@@ -1,7 +1,7 @@
 import streamlit as st
 from PIL import Image
 
-from model.model import shallownet
+# from model.model import shallownet
 from services.inference import load_model, predict
 from utils.preprocessing import preprocess
 
