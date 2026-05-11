@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-from model.model import shallownet
+# from model.model import shallownet
 import gdown
 import json
 import os
