@@ -3,22 +3,20 @@ import torch.nn.functional as F
 import json
 import os
 
-# Load class mapping
-# This assumes you have a 'model' folder in your repo containing this file
+# 1. Load class mapping locally
 with open("model/class_to_idx.json", "r") as f:
     class_to_idx = json.load(f)
 
 idx_to_class = {v: k for k, v in class_to_idx.items()}
 
-# Load model
+# 2. Load the model from the local folder
 def load_model():
-    # DIRECT LOCAL PATH - No more gdown or Google Drive
     model_path = "model/shallownet.pth"
     
     if not os.path.exists(model_path):
-        raise FileNotFoundError(f"Model file not found at {model_path}. Verify it is uploaded to GitHub.")
+        raise FileNotFoundError(f"CRITICAL: {model_path} not found. Check Git LFS status.")
 
-    # build_model() must be defined or imported in this file
+    # Note: Ensure build_model() is defined in your script or imported
     model = build_model() 
     model.load_state_dict(
         torch.load(model_path, map_location="cpu")
@@ -26,7 +24,7 @@ def load_model():
     model.eval()
     return model
 
-# Predict
+# 3. Prediction Logic
 def predict(model, tensor):
     model.eval()
     with torch.no_grad():
