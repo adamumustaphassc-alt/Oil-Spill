@@ -6,5 +6,3 @@ pillow>=10.4.0
 numpy
 gdown
 huggingface_hub
-torch
-torchvision
