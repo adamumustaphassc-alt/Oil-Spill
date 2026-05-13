@@ -1,42 +1,10 @@
 import torch
 import torch.nn.functional as F
-import gdown
 import json
 import os
-# from huggingface_hub import hf_hub_download
 
-#To Load our model from `Hugging Face`, uncomment the below code and comment out the `Google Drive download` section
-# def load_model():
-#     try:
-#         # Downloads and caches the model automatically
-#         model_path = hf_hub_download(
-#             repo_id="your-username/wildscan-model",
-#             filename="neuralnet.pth",
-#             cache_dir="model"
-            # token=st.secrets["HF_TOKEN"]  # only needed for private repos
-#         )
-
-#         model = build_model()
-#         model.load_state_dict(torch.load(model_path, map_location="cpu"))
-#         model.eval()
-#         return model
-
-#     except Exception as e:
-#         raise RuntimeError(f"Model loading failed: {e}")
-
-# Google Drive download
-def download_model():
-    if not os.path.exists("model/shallownet.pth"):
-        os.makedirs("model", exist_ok=True)
-        print("Downloading model from Google Drive...")
-        gdown.download(
-            id="19VUYmjb6bBeapFuPtwCPGvspoekgc694",  # Google Drive file ID
-            output="model/shallownet.pth",
-            quiet=False
-        )
-        print("Model downloaded successfully.")
-
-#Load class mapping
+# Load class mapping
+# Ensure class_to_idx.json is in your 'model' folder on GitHub
 with open("model/class_to_idx.json", "r") as f:
     class_to_idx = json.load(f)
 
@@ -44,10 +12,17 @@ idx_to_class = {v: k for k, v in class_to_idx.items()}
 
 # Load model
 def load_model():
-    download_model()  # downloads only if file doesn't exist
+    # We no longer call download_model() because the file is 
+    # already included in the repo via Git LFS.
+    
+    model_path = "model/shallownet.pth"
+    
+    if not os.path.exists(model_path):
+        raise FileNotFoundError(f"Model file not found at {model_path}. Check your LFS upload.")
+
     model = build_model()
     model.load_state_dict(
-        torch.load("model/shallownet.pth", map_location="cpu")
+        torch.load(model_path, map_location="cpu")
     )
     model.eval()
     return model
