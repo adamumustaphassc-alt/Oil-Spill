@@ -5,19 +5,21 @@ from torchvision import transforms
 from PIL import Image
 import json
 import os
+import gdown
+from model.model import build_model
 
-# --- MODEL ARCHITECTURE ---
-# You MUST define build_model or import it. 
-# If you have a separate file for the model, use: from model_def import build_model
-def build_model():
-    """
-    Ensure this matches the architecture used during training.
-    If 'shallownet' is a specific class you wrote, define it here.
-    """
-    # Placeholder: Replace this with your actual model class/initialization
-    # model = MyShallowNetClass() 
-    # return model
-    pass 
+# Google Drive download
+def download_model():
+    if not os.path.exists("/shallownet.pth"):
+        os.makedirs("model", exist_ok=True)
+        print("Downloading model from Google Drive...")
+        gdown.download(
+            id="1VuE0IRwpnHnnAL3MS1QZ9_ASR0mrFWFw",  # Google Drive file ID
+            output="/shallownet.pth",
+            quiet=False
+        )
+        print("Model downloaded successfully.")
+
 
 # --- CONFIGURATION ---
 with open("model/class_to_idx.json", "r") as f:
@@ -35,17 +37,15 @@ transform = transforms.Compose([
 # --- CORE FUNCTIONS ---
 
 def load_model():
-    model_path = "model/shallownet.pth"
-    
-    if not os.path.exists(model_path):
-        raise FileNotFoundError(f"CRITICAL: {model_path} not found. Check Git LFS status.")
+    download_model()  # downloads only if file doesn't exist
+    model = build_model()
 
     model = build_model() 
     if model is None:
         raise ValueError("build_model() returned None. Define your architecture in inference.py")
         
     model.load_state_dict(
-        torch.load(model_path, map_location="cpu")
+        torch.load(model, map_location="cpu")
     )
     model.eval()
     return model
