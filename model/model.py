@@ -4,15 +4,25 @@ def build_model():
     height = 224
     width = 224
 
-    model = nn.Sequential()
+    # Layers must be passed as arguments inside the parentheses
+    model = nn.Sequential(
+        # Layer 0: converts a 3D image to 1D vector
+        nn.Flatten(), 
 
-    #converts a 3D image to 1D vector
-    nn.Flatten(), 
-
-    nn.Linear(3 * height * width, 512), #takes the flattened input &maps it to 512 features(neurons)
-    nn.ReLU(), #Activation function which introduce non-linearity and allow model to learn complex patterns
-    nn.Linear(512, 128),  #reduces features from 512 input to 128(neurons)
-    nn.ReLU(), #Adds non-linearity again, prevents model from becoming just linear math
-    nn.Linear(128, 2)
+        # Layer 1: maps flattened input to 512 features
+        nn.Linear(3 * height * width, 512), 
+        
+        # Layer 2: Activation function
+        nn.ReLU(), 
+        
+        # Layer 3: reduces features from 512 to 128
+        nn.Linear(512, 128),  
+        
+        # Layer 4: Activation function
+        nn.ReLU(), 
+        
+        # Layer 5: final output for 2 classes (Oil Spill vs No Oil Spill)
+        nn.Linear(128, 2)
+    )
 
     return model
