@@ -10,12 +10,12 @@ from model.model import build_model
 
 # Google Drive download
 def download_model():
-    if not os.path.exists("/shallownet.pth"):
+    if not os.path.exists("shallownet.pth"):
         os.makedirs("model", exist_ok=True)
         print("Downloading model from Google Drive...")
         gdown.download(
             id="1VuE0IRwpnHnnAL3MS1QZ9_ASR0mrFWFw",  # Google Drive file ID
-            output="/shallownet.pth",
+            output="shallownet.pth",
             quiet=False
         )
         print("Model downloaded successfully.")
