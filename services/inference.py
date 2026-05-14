@@ -10,15 +10,27 @@ from model.model import build_model
 
 # Google Drive download
 def download_model():
-    if not os.path.exists("shallownet.pth"):
+    # Use a relative path so it stays inside your app folder
+    save_path = "model/shallownet.pth" 
+    
+    if not os.path.exists(save_path):
         os.makedirs("model", exist_ok=True)
         print("Downloading model from Google Drive...")
         gdown.download(
-            id="1VuE0IRwpnHnnAL3MS1QZ9_ASR0mrFWFw",  # Google Drive file ID
-            output="shallownet.pth",
+            id="1VuE0IRwpnHnnAL3MS1QZ9_ASR0mrFWFw",
+            output=save_path, # Path matches the exists check
             quiet=False
         )
-        print("Model downloaded successfully.")
+# def download_model():
+#     if not os.path.exists("shallownet.pth"):
+#         os.makedirs("model", exist_ok=True)
+#         print("Downloading model from Google Drive...")
+#         gdown.download(
+#             id="1VuE0IRwpnHnnAL3MS1QZ9_ASR0mrFWFw",  # Google Drive file ID
+#             output="shallownet.pth",
+#             quiet=False
+#         )
+#         print("Model downloaded successfully.")
 
 
 # --- CONFIGURATION ---
@@ -35,20 +47,39 @@ transform = transforms.Compose([
 ])
 
 # --- CORE FUNCTIONS ---
-
 def load_model():
-    download_model()  # downloads only if file doesn't exist
-    model = build_model()
-
+    download_model()  # This saves the file to "/shallownet.pth"
+    
+    # 1. Initialize the architecture
     model = build_model() 
     if model is None:
-        raise ValueError("build_model() returned None. Define your architecture in inference.py")
+        raise ValueError("build_model() returned None.")
         
-    model.load_state_dict(
-        torch.load(model, map_location="cpu")
-    )
+    # 2. FIX: Load the FILE PATH, not the model object
+    # Use the same path defined in your download_model function
+    model_path = "/shallownet.pth" 
+    
+    state_dict = torch.load(model_path, map_location="cpu")
+    
+    # 3. Load the weights into the architecture
+    model.load_state_dict(state_dict)
+    
     model.eval()
     return model
+    
+# def load_model():
+#     download_model()  # downloads only if file doesn't exist
+#     model = build_model()
+
+#     model = build_model() 
+#     if model is None:
+#         raise ValueError("build_model() returned None. Define your architecture in inference.py")
+        
+#     model.load_state_dict(
+#         torch.load(model, map_location="cpu")
+#     )
+#     model.eval()
+#     return model
 
 def predict(model, image_bytes):
     """
