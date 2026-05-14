@@ -8,18 +8,19 @@ import os
 import gdown
 from model.model import build_model
 
-# Google Drive download
+# 1. Google Drive download (Keep this logic for dynamic fetching)
 def download_model():
-    if not os.path.exists("/shallownet.pth"):
+    # Use relative path consistent with the rest of the project
+    save_path = "model/shallownet.pth"
+    if not os.path.exists(save_path):
         os.makedirs("model", exist_ok=True)
         print("Downloading model from Google Drive...")
         gdown.download(
-            id="1VuE0IRwpnHnnAL3MS1QZ9_ASR0mrFWFw",  # Google Drive file ID
-            output="/shallownet.pth",
+            id="1VuE0IRwpnHnnAL3MS1QZ9_ASR0mrFWFw",
+            output=save_path,
             quiet=False
         )
         print("Model downloaded successfully.")
-
 
 # --- CONFIGURATION ---
 with open("model/class_to_idx.json", "r") as f:
@@ -27,39 +28,34 @@ with open("model/class_to_idx.json", "r") as f:
 
 idx_to_class = {v: k for k, v in class_to_idx.items()}
 
-# Define the same transforms you used during training
-transform = transforms.Compose([
-    transforms.Resize((224, 224)), # Adjust to your model's input size
-    transforms.ToTensor(),
-    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-])
-
 # --- CORE FUNCTIONS ---
 
 def load_model():
-    download_model()  # downloads only if file doesn't exist
-    model = build_model()
-
+    download_model() 
+    
+    # Initialize the architecture
     model = build_model() 
     if model is None:
-        raise ValueError("build_model() returned None. Define your architecture in inference.py")
-        
-    model.load_state_dict(
-        torch.load(model, map_location="cpu")
-    )
+        raise ValueError("build_model() returned None. Check model/model.py")
+    
+    # FIX: Use the file path string, NOT the model object itself
+    model_path = "model/shallownet.pth"
+    
+    # Load state dict from the file
+    state_dict = torch.load(model_path, map_location="cpu")
+    model.load_state_dict(state_dict)
+    
     model.eval()
     return model
 
-def predict(model, image_bytes):
+def predict(model, tensor):
     """
-    Takes raw image bytes from Streamlit's file_uploader, 
-    transforms them, and returns the prediction.
+    Takes a pre-processed tensor (already handled by app.py) 
+    and returns the prediction.
     """
-    # 1. Preprocess the image
-    img = Image.open(image_bytes).convert('RGB')
-    tensor = transform(img).unsqueeze(0) # Add batch dimension
+    # We remove the Image.open logic here because your app.py 
+    # is already doing the preprocessing!
     
-    # 2. Run Inference
     model.eval()
     with torch.no_grad():
         output = model(tensor)
