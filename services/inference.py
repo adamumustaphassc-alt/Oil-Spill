@@ -57,7 +57,7 @@ def load_model():
         
     # 2. FIX: Load the FILE PATH, not the model object
     # Use the same path defined in your download_model function
-    model_path = "/shallownet.pth" 
+    model_path = "model/shallownet.pth" 
     
     state_dict = torch.load(model_path, map_location="cpu")
     
